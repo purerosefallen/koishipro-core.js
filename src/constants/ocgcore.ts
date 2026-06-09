@@ -8,3 +8,7 @@ export const REGISTRY_BUFFER_SIZE = 0x2000;
 export const LEN_FAIL = 0;
 export const LEN_EMPTY = 4;
 export const LEN_HEADER = 8;
+
+export const OcgcoreCreateFlags = {
+  EnableLuaCoverage: 0x00000001,
+} as const;
