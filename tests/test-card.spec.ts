@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
 
 import initSqlJs from 'sql.js';
 
@@ -8,23 +7,17 @@ import { DirScriptReader } from '../src/script-reader';
 import { SqljsCardReader } from '../src/card-reader';
 import { testCard } from '../src/test-card';
 import { OcgcoreMessageType } from '../src/types/ocgcore-enums';
-
-function resolveProjectFile(relativePath: string): string {
-  return path.join(process.env.HOME, 'ygo', 'ygopro', relativePath);
-}
+import {
+  requireYgoproCardsPath,
+  requireYgoproScriptDir,
+} from './helpers/ygopro-resources';
 
 describe('testCard', () => {
   jest.setTimeout(60000);
 
   test('runs card 10000 without script errors', async () => {
-    const scriptDir = resolveProjectFile('script');
-    const cardsPath = resolveProjectFile('cards.cdb');
-    if (!fs.existsSync(scriptDir)) {
-      throw new Error(`Missing script dir: ${scriptDir}`);
-    }
-    if (!fs.existsSync(cardsPath)) {
-      throw new Error(`Missing cards db: ${cardsPath}`);
-    }
+    const scriptDir = requireYgoproScriptDir();
+    const cardsPath = requireYgoproCardsPath();
 
     const wasmBinary = fs.readFileSync('src/vendor/wasm_cjs/libocgcore.wasm');
     const wrapper = await createOcgcoreWrapper({ wasmBinary });
@@ -45,14 +38,8 @@ describe('testCard', () => {
   });
 
   test('fails when card script throws error', async () => {
-    const scriptDir = resolveProjectFile('script');
-    const cardsPath = resolveProjectFile('cards.cdb');
-    if (!fs.existsSync(scriptDir)) {
-      throw new Error(`Missing script dir: ${scriptDir}`);
-    }
-    if (!fs.existsSync(cardsPath)) {
-      throw new Error(`Missing cards db: ${cardsPath}`);
-    }
+    const scriptDir = requireYgoproScriptDir();
+    const cardsPath = requireYgoproCardsPath();
 
     const wasmBinary = fs.readFileSync('src/vendor/wasm_cjs/libocgcore.wasm');
     const wrapper = await createOcgcoreWrapper({ wasmBinary });

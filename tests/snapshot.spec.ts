@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
 
 import initSqlJs from 'sql.js';
 import { YGOProMsgResponseBase, YGOProMsgRetry } from 'ygopro-msg-encode';
@@ -13,25 +12,7 @@ import { OcgcoreWrapper } from '../src/ocgcore-wrapper';
 import { createDuelFromYrp } from '../src/play-yrp';
 import { SqljsCardReader } from '../src/card-reader';
 import { DirScriptReader } from '../src/script-reader';
-
-function getReplayFixturePaths() {
-  const scriptDir = path.join(process.cwd(), 'ygopro-scripts');
-  if (!fs.existsSync(scriptDir)) {
-    throw new Error(`Missing script dir: ${scriptDir}`);
-  }
-
-  const cardsPath = path.join(process.cwd(), 'cards.cdb');
-  if (!fs.existsSync(cardsPath)) {
-    throw new Error(`Missing cards db: ${cardsPath}`);
-  }
-
-  const yrpPath = path.join(process.cwd(), 'tests', 'test.yrp');
-  if (!fs.existsSync(yrpPath)) {
-    throw new Error(`Missing replay file: ${yrpPath}`);
-  }
-
-  return { scriptDir, cardsPath, yrpPath };
-}
+import { getReplayFixturePaths } from './helpers/ygopro-resources';
 
 function configureReplayWrapper(
   wrapper: OcgcoreWrapper,
@@ -89,7 +70,9 @@ async function playYrpRawProcessPayloads(
   snapshotAt?: number,
 ): Promise<Uint8Array[]> {
   let wrapper = await createReplayWrapper(SQL, scriptDir, cardsBytes);
-  let { yrp, duel } = createDuelFromYrp(wrapper, yrpBytes);
+  const replay = createDuelFromYrp(wrapper, yrpBytes);
+  const { yrp } = replay;
+  let { duel } = replay;
   const responses = yrp.responses.slice();
   const outputs: Uint8Array[] = [];
 
@@ -201,7 +184,9 @@ async function playYrpWithGrowthSnapshots(
   processedAfterFirstRestore: boolean;
 }> {
   let wrapper = await createReplayWrapper(SQL, scriptDir, cardsBytes);
-  let { yrp, duel } = createDuelFromYrp(wrapper, yrpBytes);
+  const replay = createDuelFromYrp(wrapper, yrpBytes);
+  const { yrp } = replay;
+  let { duel } = replay;
   const responses = yrp.responses.slice();
   const outputs: Uint8Array[] = [];
   const growEvents: Array<{ before: number; after: number }> = [];

@@ -1,5 +1,4 @@
 import fs from 'node:fs';
-import path from 'node:path';
 
 import initSqlJs from 'sql.js';
 import { YGOProMsgNewTurn } from 'ygopro-msg-encode';
@@ -9,25 +8,13 @@ import { playYrpStep } from '../src/play-yrp';
 import { DirScriptReader } from '../src/script-reader';
 import { SqljsCardReader } from '../src/card-reader';
 import { OcgcoreCommonConstants, OcgcoreScriptConstants } from '../src/vendor';
+import { getReplayFixturePaths } from './helpers/ygopro-resources';
 
 describe('playYrp', () => {
   jest.setTimeout(60000);
 
   test('plays a yrp replay step by step and queries game state', async () => {
-    const scriptDir = path.join(process.cwd(), 'ygopro-scripts');
-    if (!fs.existsSync(scriptDir)) {
-      throw new Error(`Missing script dir: ${scriptDir}`);
-    }
-
-    const cardsPath = path.join(process.cwd(), 'cards.cdb');
-    if (!fs.existsSync(cardsPath)) {
-      throw new Error(`Missing cards db: ${cardsPath}`);
-    }
-
-    const yrpPath = path.join(process.cwd(), 'tests', 'test.yrp');
-    if (!fs.existsSync(yrpPath)) {
-      throw new Error(`Missing replay file: ${yrpPath}`);
-    }
+    const { scriptDir, cardsPath, yrpPath } = getReplayFixturePaths();
 
     const wrapper = await createOcgcoreWrapper();
 

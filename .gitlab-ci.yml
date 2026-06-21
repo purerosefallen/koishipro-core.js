@@ -1,5 +1,6 @@
 stages:
   - install
+  - prepare
   - build
   - deploy
 
@@ -15,6 +16,19 @@ npm_ci:
   artifacts:
     paths:
       - node_modules
+
+prepare_jest_env:
+  stage: prepare
+  dependencies: []
+  tags:
+    - linux
+  script:
+    - mkdir -p ygopro
+    - git clone --depth=1 https://code.moenext.com/nanahira/ygopro-scripts ygopro/script
+    - wget https://code.moenext.com/mycard/ygopro-database/-/raw/master/locales/zh-CN/cards.cdb -O ygopro/cards.cdb
+  artifacts:
+    paths:
+      - ygopro
 
 .build_base:
   stage: build
@@ -35,8 +49,12 @@ build:
 unit-test:
   extends:
     - .build_base
+  dependencies:
+    - npm_ci
+    - prepare_jest_env
+  variables:
+    YGOPRO_DIR: ygopro
   script:
-    - git clone --depth=1 https://github.com/Smile-DK/ygopro-scripts.git ./ygopro-scripts
     - npm run test
 
 deploy_npm:

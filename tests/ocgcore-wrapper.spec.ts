@@ -1,27 +1,17 @@
-import fs from 'node:fs';
-import path from 'node:path';
-
 import { createOcgcoreWrapper } from '../src/create-ocgcore-wrapper';
 import { DirScriptReader } from '../src/script-reader';
 import type { CardData } from 'ygopro-msg-encode';
 import { OcgcoreScriptConstants } from '../src/vendor';
+import { requireYgoproScriptDir } from './helpers/ygopro-resources';
 
 describe('ocgcore wasm flow', () => {
   jest.setTimeout(30000);
 
   test('runs a basic duel process loop', async () => {
     const wrapper = await createOcgcoreWrapper();
-    let baseDir = path.join(process.cwd(), 'ygopro-scripts');
-    if (!fs.existsSync(baseDir)) {
-      const fallback = process.env.HOME + '/ygo/ygopro/script';
-      if (fs.existsSync(fallback)) {
-        baseDir = fallback;
-      } else {
-        return;
-      }
-    }
+    const scriptDir = requireYgoproScriptDir();
 
-    wrapper.setScriptReader(DirScriptReader(baseDir));
+    wrapper.setScriptReader(DirScriptReader(scriptDir));
 
     wrapper.setCardReader(
       (cardId): Partial<CardData> => ({
