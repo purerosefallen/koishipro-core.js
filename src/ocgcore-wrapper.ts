@@ -252,22 +252,29 @@ export class OcgcoreWrapper {
     this.ocgcoreModule.removeFunction(index);
   }
 
-  createDuel(seed: number): OcgcoreDuel {
-    const duelPtr = this.ocgcoreModule._create_duel(seed);
+  createDuel(seed: number, createFlags = 0): OcgcoreDuel {
+    const duelPtr = createFlags
+      ? this.ocgcoreModule._create_duel_ex(seed, createFlags)
+      : this.ocgcoreModule._create_duel(seed);
     return this.getOrCreateDuel(duelPtr);
   }
 
-  createDuelV2(seedSequence: number[]): OcgcoreDuel {
+  createDuelV2(seedSequence: number[], createFlags = 0): OcgcoreDuel {
     const count = seedSequence.length;
     const byteLength = count * 4;
     const ptr = this.ocgcoreModule._malloc(byteLength);
-    const view = new Uint32Array(this.heapU8.buffer, ptr, count);
-    for (let i = 0; i < count; i++) {
-      view[i] = seedSequence[i] >>> 0;
+    try {
+      const view = new Uint32Array(this.heapU8.buffer, ptr, count);
+      for (let i = 0; i < count; i++) {
+        view[i] = seedSequence[i] >>> 0;
+      }
+      const duelPtr = createFlags
+        ? this.ocgcoreModule._create_duel_v2_ex(ptr, createFlags)
+        : this.ocgcoreModule._create_duel_v2(ptr);
+      return this.getOrCreateDuel(duelPtr);
+    } finally {
+      this.ocgcoreModule._free(ptr);
     }
-    const duelPtr = this.ocgcoreModule._create_duel_v2(ptr);
-    this.ocgcoreModule._free(ptr);
-    return this.getOrCreateDuel(duelPtr);
   }
 
   _defaultScriptReader(namePtr: number, dataPtr: number): number {

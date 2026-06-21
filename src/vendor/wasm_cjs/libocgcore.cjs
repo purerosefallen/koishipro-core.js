@@ -4383,8 +4383,18 @@ var _create_duel = Module["_create_duel"] = function() {
 };
 
 /** @type {function(...*):?} */
+var _create_duel_ex = Module["_create_duel_ex"] = function() {
+  return (_create_duel_ex = Module["_create_duel_ex"] = Module["asm"]["create_duel_ex"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
 var _create_duel_v2 = Module["_create_duel_v2"] = function() {
   return (_create_duel_v2 = Module["_create_duel_v2"] = Module["asm"]["create_duel_v2"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _create_duel_v2_ex = Module["_create_duel_v2_ex"] = function() {
+  return (_create_duel_v2_ex = Module["_create_duel_v2_ex"] = Module["asm"]["create_duel_v2_ex"]).apply(null, arguments);
 };
 
 /** @type {function(...*):?} */
@@ -4490,6 +4500,36 @@ var _dump_registry = Module["_dump_registry"] = function() {
 /** @type {function(...*):?} */
 var _load_registry = Module["_load_registry"] = function() {
   return (_load_registry = Module["_load_registry"] = Module["asm"]["load_registry"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _get_lua_coverage_dump_size = Module["_get_lua_coverage_dump_size"] = function() {
+  return (_get_lua_coverage_dump_size = Module["_get_lua_coverage_dump_size"] = Module["asm"]["get_lua_coverage_dump_size"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _dump_lua_coverage = Module["_dump_lua_coverage"] = function() {
+  return (_dump_lua_coverage = Module["_dump_lua_coverage"] = Module["asm"]["dump_lua_coverage"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _get_all_lua_coverages_dump_size = Module["_get_all_lua_coverages_dump_size"] = function() {
+  return (_get_all_lua_coverages_dump_size = Module["_get_all_lua_coverages_dump_size"] = Module["asm"]["get_all_lua_coverages_dump_size"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _dump_all_lua_coverages = Module["_dump_all_lua_coverages"] = function() {
+  return (_dump_all_lua_coverages = Module["_dump_all_lua_coverages"] = Module["asm"]["dump_all_lua_coverages"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _clear_lua_coverage = Module["_clear_lua_coverage"] = function() {
+  return (_clear_lua_coverage = Module["_clear_lua_coverage"] = Module["asm"]["clear_lua_coverage"]).apply(null, arguments);
+};
+
+/** @type {function(...*):?} */
+var _clear_all_lua_coverages = Module["_clear_all_lua_coverages"] = function() {
+  return (_clear_all_lua_coverages = Module["_clear_all_lua_coverages"] = Module["asm"]["clear_all_lua_coverages"]).apply(null, arguments);
 };
 
 /** @type {function(...*):?} */

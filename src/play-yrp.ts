@@ -73,14 +73,15 @@ function setRegistryValue(duel: OcgcoreDuel, key: string, value: string): void {
 export function createDuelFromYrp(
   wrapper: OcgcoreWrapper,
   yrpInput: YGOProYrp | Uint8Array,
+  createFlags = 0,
 ) {
   const yrp = normalizeYrp(yrpInput);
   const header = yrp.header;
   const seedSequence = header?.seedSequence ?? [];
   const duel =
     seedSequence.length > 0
-      ? wrapper.createDuelV2(seedSequence)
-      : wrapper.createDuel(header?.seed ?? 0);
+      ? wrapper.createDuelV2(seedSequence, createFlags)
+      : wrapper.createDuel(header?.seed ?? 0, createFlags);
 
   setRegistryValue(duel, 'duel_mode', yrp.isTag ? 'tag' : 'single');
   setRegistryValue(duel, 'start_lp', String(yrp.startLp));

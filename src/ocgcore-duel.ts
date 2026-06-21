@@ -47,6 +47,16 @@ import {
   OCGCORE_DUEL_SNAPSHOT_VERSION,
   OcgcoreDuelSnapshotState,
 } from './ocgcore-snapshot';
+import {
+  OcgcoreLuaCoverageMap,
+  OcgcoreLuaLineCoverage,
+} from './types/lua-coverage';
+import {
+  normalizeLuaCoverageName,
+  parseAllLuaCoverages,
+  parseLuaCoveragePairs,
+  toLuaLineCoverage,
+} from './utility/lua-coverage';
 
 export class OcgcoreDuel {
   private static readonly RECEIVE_SIZE = Math.max(
@@ -423,5 +433,82 @@ export class OcgcoreDuel {
         this.setRegistryValue(key, value);
       }
     }
+  }
+
+  getLuaCoverage(name: string): OcgcoreLuaLineCoverage {
+    const normalizedName = normalizeLuaCoverageName(name);
+    const size = this.ocgcoreWrapper.useTmpData(
+      (namePtr) =>
+        this.ocgcoreWrapper.ocgcoreModule._get_lua_coverage_dump_size(
+          this.duelPtr,
+          namePtr,
+        ),
+      name,
+    );
+    if (size <= 0) {
+      return toLuaLineCoverage(normalizedName, {});
+    }
+    const ptr = this.ocgcoreWrapper.malloc(size);
+    try {
+      const written = this.ocgcoreWrapper.useTmpData(
+        (namePtr) =>
+          this.ocgcoreWrapper.ocgcoreModule._dump_lua_coverage(
+            this.duelPtr,
+            namePtr,
+            ptr,
+            size,
+          ),
+        name,
+      );
+      if (written !== size) {
+        throw new Error('Lua coverage dump size changed while reading.');
+      }
+      const raw = this.ocgcoreWrapper.copyHeap(ptr, size);
+      return parseLuaCoveragePairs(normalizedName, raw);
+    } finally {
+      this.ocgcoreWrapper.free(ptr);
+    }
+  }
+
+  getAllLuaCoverages(): OcgcoreLuaCoverageMap {
+    const size =
+      this.ocgcoreWrapper.ocgcoreModule._get_all_lua_coverages_dump_size(
+        this.duelPtr,
+      );
+    if (size <= 0) {
+      return {};
+    }
+    const ptr = this.ocgcoreWrapper.malloc(size);
+    try {
+      const written = this.ocgcoreWrapper.ocgcoreModule._dump_all_lua_coverages(
+        this.duelPtr,
+        ptr,
+        size,
+      );
+      if (written !== size) {
+        throw new Error('Lua coverage dump size changed while reading.');
+      }
+      const raw = this.ocgcoreWrapper.copyHeap(ptr, size);
+      return parseAllLuaCoverages(raw);
+    } finally {
+      this.ocgcoreWrapper.free(ptr);
+    }
+  }
+
+  clearLuaCoverage(name: string): this {
+    this.ocgcoreWrapper.useTmpData(
+      (namePtr) =>
+        this.ocgcoreWrapper.ocgcoreModule._clear_lua_coverage(
+          this.duelPtr,
+          namePtr,
+        ),
+      name,
+    );
+    return this;
+  }
+
+  clearAllLuaCoverages(): this {
+    this.ocgcoreWrapper.ocgcoreModule._clear_all_lua_coverages(this.duelPtr);
+    return this;
   }
 }
